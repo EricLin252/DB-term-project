@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>即時交通事故查詢與回報系統</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	<script src="functions.js"></script>
+</head>
+<body>
+	<header>即時交通事故查詢與回報系統</header>
+	<button id="list_btn"></button>
+	<div id="list">
+		<button class="nav_btn" id="find">
+			搜尋事故
+		</button><button class="nav_btn" id="upload">
+			通報事故
+		</button><button class="nav_btn" id="history">
+			搜尋紀錄
+		</button><button class="nav_btn" id="my_upload">
+			上傳紀錄
+		</button>
+		<div class="window" id="find_page">
+			<button class="dropdown_btn" id="pos">地點 ▼</button><span class="tmp" id="pos_tmp"></span><br>
+			<div class="dropdown" id="pos_page">
+				<select id="find_county" style="width: 45%;">
+				</select><select id="find_township" style="width: 45%;">
+				</select><br>
+				<select id="find_street" style="width: 90%;">
+				</select><br>
+				<input type="text" id="find_detail" placeholder="請輸入詳細地址(巷、弄...)" style="width: 90%;">
+			</div>
+			<button class="dropdown_btn" id="time">時間 ▼</button><span class="tmp" id="time_tmp"></span><br>
+			<div class="dropdown" id="time_page">
+				<span>起始時間：</span><input type="date" id="start_t"><br>
+				<span>結束時間：</span><input type="date" id="end_t">
+			</div>
+			<button class="dropdown_btn" id="serious">嚴重性 ▼</button><span class="tmp" id="serious_tmp">A1, A2, A3</span><br>
+			<div class="dropdown" id="serious_page">
+				<span><input type="checkbox" value="A1" checked>立即死亡</span>
+				<span><input type="checkbox" value="A2" checked>傷亡</span>
+				<span><input type="checkbox" value="A3" checked>輕微損傷</span>
+			</div>
+			<hr>
+			<p>
+				<button id="find_reset">
+					重置
+				</button><button id="find_submit">
+					確認
+				</button>
+			</p>
+		</div>
+		<div class="window" id="upload_page">
+			<p>地點</p>
+			<select id="upload_county" style="width: 45%;">
+			</select><select id="upload_township" style="width: 45%;">
+			</select><br>
+			<select id="upload_street" style="width: 90%;">
+			</select><br>
+			<input type="text" id="upload_detail" placeholder="請輸入詳細地址(巷、弄...)" style="width: 90%;">
+			<p>時間</p>
+			<input type="date" id="upload_date"><input type="time" id="upload_time">
+			<p>嚴重性</p>
+			<select id="upload_serious" style="width: 50%;">
+				<option value="A1">立即死亡</option>
+				<option value="A2">傷亡</option>
+				<option value="A3" selected="selected">輕微損傷</option>
+			</select>
+			<hr>
+			<p>
+				<button id="upload_reset">
+					重置
+				</button><button id="upload_submit">
+					確認
+				</button>
+			</p>
+		</div>
+		<div class="window" id="history_page">
+			<p>尚無任何紀錄</p>
+		</div>
+		<div class="window" id="my_upload_page">
+			<p>尚無任何紀錄</p>
+		</div>
+	</div>
+	<div id="insert"></div>
+	<div id="sql">今日事故</div>
+	<div id="result">
+		<button class="sql_result">新竹市北區中央路</button>
+	</div>
+	<div id="result_detail">
+		<span class="result_title">時間</span><span id="happen_time">2020/01/21&emsp;06:25:18</span>
+		<span class="result_title">傷亡情況</span><span id="injury">死亡1, 受傷0</span><br>
+		<span class="result_title">交通工具</span><span id="situation">公營客運-大客車 / 行人-人</span><br>
+		<span class="result_title">經緯度座標</span><span id="gps_pos">120.969152, 24.805852</span>
+		<div id="upload_video">
+			上傳行車紀錄影片<br>
+			<input type="file" id="upload_file" accept="video/*">
+			<button id="upload_file_submit">確認</button>
+		</div>
+		<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3621.6200346163723!2d120.97108761500165!3d24.808461184078485!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x346835c491d4c3a7%3A0xf6e00d605ae56e5c!2zMzAw5paw56u55biC5YyX5Y2A5Lit5aSu6Lev!5e0!3m2!1szh-TW!2stw!4v1592866712597!5m2!1szh-TW!2stw" width="400" height="300" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+	</div>
+</body>
+</html>
