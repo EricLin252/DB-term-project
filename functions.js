@@ -1,22 +1,4 @@
 var nav_state = null, use_group = false;
-var county = ["臺北市", "新北市", "基隆市", "桃園市", "新竹市", "新竹縣"
-			, "苗栗縣", "臺中市", "彰化縣", "雲林縣", "南投縣"
-			, "嘉義市", "嘉義縣", "臺南市", "高雄市", "屏東縣"
-			, "宜蘭縣", "花蓮縣", "台東縣", "澎湖縣"];
-var township = ["北區", "東區", "香山區"];
-var street = ["世界路", "中正路", "中山路", "中央路"];
-var data = [
-	{
-		county: "新竹市",
-		township: "北區",
-		street: "中央路",
-		injury: "死亡1, 受傷0",
-		serious: "A1",
-		situation: "公營客運-大客車 / 行人-人",
-		longitude: "120.969152",
-		latitude: "24.805852"
-	},
-];
 
 $(document).ready(function(){
 	$("#list_btn").click(function(){
@@ -423,8 +405,24 @@ function getTimeStr(D){
 }
 
 function setCounty(){
+	var county = [];
 	$("#find_county").html("<option value=''>請選擇縣市</option>");
 	$("#upload_county").html("<option value=''>請選擇縣市</option>");
+	$.ajax({
+		url: "ajax/ajax.php",
+		async: false,
+		data: ({ mode: "county" }),
+		type: "POST",
+		cache: false,
+		success: function(response){
+			console.log(response);
+			county = response.split(" ");
+		},
+		error: function(xhr, status, error) {
+			var err = eval("(" + xhr.responseText + ")");
+			alert(error);
+		}
+	});
 	for(var i = 0; i < county.length; i++){
 		$("#find_county").append("<option value='" + county[i] + "'>" + county[i] + "</option>");
 		$("#upload_county").append("<option value='" + county[i] + "'>" + county[i] + "</option>");
@@ -434,8 +432,24 @@ function setCounty(){
 }
 
 function setTownship(mode, county){
+	var township = [];
 	var target = "#" + mode + "_township";
 	$(target).html("<option value=''>請選擇鄉鎮市區</option>");
+	$.ajax({
+		url: "ajax/ajax.php",
+		async: false,
+		data: ({ mode: "township", county: county }),
+		type: "POST",
+		cache: false,
+		success: function(response){
+			console.log(response);
+			township = response.split(" ");
+		},
+		error: function(xhr, status, error) {
+			var err = eval("(" + xhr.responseText + ")");
+			alert(error);
+		}
+	});
 	for(var i = 0; i < township.length; i++){
 		$(target).append("<option value='" + township[i] + "'>" + township[i] + "</option>");
 	}
@@ -443,8 +457,24 @@ function setTownship(mode, county){
 }
 
 function setStreet(mode, county, township){
+	var street = [];
 	var target = "#" + mode + "_street";
 	$(target).html("<option value=''>請選擇街道名稱</option>");
+	$.ajax({
+		url: "ajax/ajax.php",
+		async: false,
+		data: ({ mode: "street", county: county, township: township }),
+		type: "POST",
+		cache: false,
+		success: function(response){
+			console.log(response);
+			street = response.split(" ");
+		},
+		error: function(xhr, status, error) {
+			var err = eval("(" + xhr.responseText + ")");
+			alert(error);
+		}
+	});
 	for(var i = 0; i < street.length; i++){
 		$(target).append("<option value='" + street[i] + "'>" + street[i] + "</option>");
 	}
