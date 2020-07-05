@@ -206,7 +206,6 @@ $(document).ready(function(){
 				}
 			}
 		}
-		/*
 		else{
 			if($("#pos_tmp").text() == "" && $("#time_tmp").text() == "") sql = "條件過少，無法搜尋";
 			else{
@@ -249,7 +248,6 @@ $(document).ready(function(){
 			$("#result").show();
 			$("#result_detail").hide();
 		}
-		*/
 	});
 
 	var Tstr_v = getTimeStr(new Date());
@@ -405,6 +403,7 @@ function getTimeStr(D){
 }
 
 function setCounty(){
+	$("#blocker").show();
 	var county = [];
 	$("#find_county").html("<option value=''>請選擇縣市</option>");
 	$("#upload_county").html("<option value=''>請選擇縣市</option>");
@@ -429,9 +428,11 @@ function setCounty(){
 	}
 	$("#find_county").prop("selectedIndex", 0);
 	$("#upload_county").prop("selectedIndex", 0);
+	$("#blocker").hide();
 }
 
 function setTownship(mode, county){
+	$("#blocker").show();
 	var township = [];
 	var target = "#" + mode + "_township";
 	$(target).html("<option value=''>請選擇鄉鎮市區</option>");
@@ -454,9 +455,11 @@ function setTownship(mode, county){
 		$(target).append("<option value='" + township[i] + "'>" + township[i] + "</option>");
 	}
 	$(target).prop("selectedIndex", 0);
+	$("#blocker").hide();
 }
 
 function setStreet(mode, county, township){
+	$("#blocker").show();
 	var street = [];
 	var target = "#" + mode + "_street";
 	$(target).html("<option value=''>請選擇街道名稱</option>");
@@ -479,6 +482,7 @@ function setStreet(mode, county, township){
 		$(target).append("<option value='" + street[i] + "'>" + street[i] + "</option>");
 	}
 	$(target).prop("selectedIndex", 0);
+	$("#blocker").hide();
 }
 
 function checkGroup(id, value){

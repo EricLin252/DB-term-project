@@ -3,13 +3,14 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>即時交通事故查詢與回報系統</title>
+	<title>交通事故查詢與回報系統</title>
 	<link rel="stylesheet" href="style.css">
 	<script src="jquery.js"></script>
 	<script src="functions.js"></script>
 </head>
 <body>
-	<header>即時交通事故查詢與回報系統</header>
+	<header>交通事故查詢與回報系統</header>
+	<div id="blocker"></div>
 	<button id="list_btn"></button>
 	<div id="list">
 		<button class="nav_btn" id="find">
@@ -74,7 +75,7 @@
 			<select id="upload_street" style="width: 90%;" disabled>
 				<option value="">請選擇街道名稱</option>
 			</select><br>
-			<input type="text" id="upload_detail" placeholder="請輸入詳細地址(巷、弄...)" style="width: 90%;" disabled>
+			<input type="text" id="upload_detail" placeholder="請輸入地址關鍵字" style="width: 90%;" disabled>
 			<p>時間</p>
 			<input type="date" id="upload_date"><input type="time" id="upload_time">
 			<p>嚴重性</p>
@@ -99,11 +100,11 @@
 			<p>尚無任何紀錄</p>
 		</div>
 	</div>
-	<div id="insert"></div>
 	<div id="sql">今日事故</div>
 	<div id="result">
 		<button class="sql_result">新竹市北區中央路</button>
 	</div>
+	<div id="insert"></div>
 	<div id="result_detail">
 		<span class="result_title">時間</span><span id="happen_time">2020/01/21&emsp;06:25:18</span>
 		<span class="result_title">傷亡情況</span><span id="injury">死亡1, 受傷0</span><br>
