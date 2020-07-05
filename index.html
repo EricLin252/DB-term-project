@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>即時交通事故查詢與回報系統</title>
 	<link rel="stylesheet" href="style.css">
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	<script src="jquery.js"></script>
 	<script src="functions.js"></script>
 </head>
 <body>
@@ -22,29 +22,43 @@
 			上傳紀錄
 		</button>
 		<div class="window" id="find_page">
-			<button class="dropdown_btn" id="pos">地點 ▼</button><span class="tmp" id="pos_tmp"></span><br>
-			<div class="dropdown" id="pos_page">
-				<select id="find_county" style="width: 45%;">
-				</select><select id="find_township" style="width: 45%;">
-				</select><br>
-				<select id="find_street" style="width: 90%;">
-				</select><br>
-				<input type="text" id="find_detail" placeholder="請輸入詳細地址(巷、弄...)" style="width: 90%;">
+			<div id="basic_find">
+				<button class="dropdown_btn" id="pos">地點 ▼</button><span class="tmp" id="pos_tmp"></span><br>
+				<div class="dropdown" id="pos_page">
+					<select id="find_county" style="width: 45%;">
+					</select><select id="find_township" style="width: 45%;" disabled>
+						<option value="">請選擇鄉鎮市區</option>
+					</select><br>
+					<select id="find_street" style="width: 90%;" disabled>
+						<option value="">請選擇街道名稱</option>
+					</select><br>
+					<input type="text" id="find_detail" placeholder="請輸入關鍵字" style="width: 90%;" disabled>
+				</div>
+				<button class="dropdown_btn" id="time">時間 ▼</button><span class="tmp" id="time_tmp"></span><br>
+				<div class="dropdown" id="time_page">
+					<span>起始時間：</span><input type="date" id="start_t"><br>
+					<span>結束時間：</span><input type="date" id="end_t"><br>
+					<button id="t_reset">×</button>
+				</div>
+				<button class="dropdown_btn" id="serious">嚴重性 ▼</button><span class="tmp" id="serious_tmp">A1, A2</span><br>
+				<div class="dropdown" id="serious_page">
+					<span><input type="checkbox" value="A1" checked>立即死亡</span>
+					<span><input type="checkbox" value="A2" checked>傷亡</span>
+					<!--<span><input type="checkbox" value="A3" checked>輕微損傷</span>-->
+				</div>
 			</div>
-			<button class="dropdown_btn" id="time">時間 ▼</button><span class="tmp" id="time_tmp"></span><br>
-			<div class="dropdown" id="time_page">
-				<span>起始時間：</span><input type="date" id="start_t"><br>
-				<span>結束時間：</span><input type="date" id="end_t">
-			</div>
-			<button class="dropdown_btn" id="serious">嚴重性 ▼</button><span class="tmp" id="serious_tmp">A1, A2, A3</span><br>
-			<div class="dropdown" id="serious_page">
-				<span><input type="checkbox" value="A1" checked>立即死亡</span>
-				<span><input type="checkbox" value="A2" checked>傷亡</span>
-				<span><input type="checkbox" value="A3" checked>輕微損傷</span>
+			<hr id="group_hr" style="display: none;">
+			<div id="group_find" style="display: none;">
+				<p>分群統計</p>
+				<p><button id="group_county" value="">縣市</button><button id="group_township" value="">鄉鎮市區</button><button id="group_street" value="">街道名稱</button></p>
+				<p><button id="group_year" value="">年</button><button id="group_month" value="">月</button><button id="group_date" value="">日</button></p>
+				<p><button id="group_cal" value="">交通工具</button><button id="group_serious" value="">嚴重程度</button></p>
 			</div>
 			<hr>
 			<p>
-				<button id="find_reset">
+				<button id="group_toggle">
+					事故統計
+				</button><button id="find_reset">
 					重置
 				</button><button id="find_submit">
 					確認
@@ -54,18 +68,20 @@
 		<div class="window" id="upload_page">
 			<p>地點</p>
 			<select id="upload_county" style="width: 45%;">
-			</select><select id="upload_township" style="width: 45%;">
+			</select><select id="upload_township" style="width: 45%;" disabled>
+				<option value="">請選擇鄉鎮市區</option>
 			</select><br>
-			<select id="upload_street" style="width: 90%;">
+			<select id="upload_street" style="width: 90%;" disabled>
+				<option value="">請選擇街道名稱</option>
 			</select><br>
-			<input type="text" id="upload_detail" placeholder="請輸入詳細地址(巷、弄...)" style="width: 90%;">
+			<input type="text" id="upload_detail" placeholder="請輸入詳細地址(巷、弄...)" style="width: 90%;" disabled>
 			<p>時間</p>
 			<input type="date" id="upload_date"><input type="time" id="upload_time">
 			<p>嚴重性</p>
 			<select id="upload_serious" style="width: 50%;">
 				<option value="A1">立即死亡</option>
 				<option value="A2">傷亡</option>
-				<option value="A3" selected="selected">輕微損傷</option>
+				<!--<option value="A3" selected="selected">輕微損傷</option>-->
 			</select>
 			<hr>
 			<p>

@@ -1,5 +1,8 @@
-var nav_state = null;
-var county = ["臺北市", "新北市", "桃園市", "臺中市", "臺南市", "高雄市", "新竹市"];
+var nav_state = null, use_group = false;
+var county = ["臺北市", "新北市", "基隆市", "桃園市", "新竹市", "新竹縣"
+			, "苗栗縣", "臺中市", "彰化縣", "雲林縣", "南投縣"
+			, "嘉義市", "嘉義縣", "臺南市", "高雄市", "屏東縣"
+			, "宜蘭縣", "花蓮縣", "台東縣", "澎湖縣"];
 var township = ["北區", "東區", "香山區"];
 var street = ["世界路", "中正路", "中山路", "中央路"];
 var data = [
@@ -53,19 +56,55 @@ $(document).ready(function(){
 		}
 	);
 
-	setCounty();
-	setTownship();
-	setStreet();
-
-	$("#pos_page select").change(function(){
-		$("#pos_tmp").text(
-			$("#find_county").val() + $("#find_township").val() + $("#find_street").val() + " " + $("#find_detail").val()
-		);
+	$(".window select").focus(function(){
+		$(this).attr("size", "10");
 	});
 
-	$("#pos_page input").change(function(){
+	$(".window select").blur(function(){
+		$(this).removeAttr("size");
+	});
+
+	$(".window select").change(function(){
+		$(this).blur();
+	});
+
+	setCounty();
+
+	$("#pos_page select, #pos_page input").change(function(){
+		if($(this).attr("id") == "find_county"){
+			if($(this).val() == ""){
+				$("#find_township").prop({"selectedIndex": 0, "disabled": true});
+				$("#find_street").prop({"selectedIndex": 0, "disabled": true});
+				$("#find_detail").val("");
+				$("#find_detail").prop("disabled", true);
+			}
+			else{
+				$("#find_township").prop("disabled", false);
+				setTownship("find", $(this).val());
+			}
+		}
+		else if($(this).attr("id") == "find_township"){
+			if($(this).val() == ""){
+				$("#find_street").prop({"selectedIndex": 0, "disabled": true});
+				$("#find_detail").val("");
+				$("#find_detail").prop("disabled", true);
+			}
+			else{
+				$("#find_street").prop("disabled", false);
+				setStreet("find", $("#find_county").val(), $(this).val());
+			}
+		}
+		else if($(this).attr("id") == "find_street"){
+			if($(this).val() == ""){
+				$("#find_detail").val("");
+				$("#find_detail").prop("disabled", true);
+			}
+			else{
+				$("#find_detail").prop("disabled", false);
+			}
+		}
 		$("#pos_tmp").text(
-			$("#find_county").val() + $("#find_township").val() + $("#find_street").val() + $("#find_detail").val()
+			$("#find_county").val() + $("#find_township").val() + $("#find_street").val() + " " + $("#find_detail").val()
 		);
 	});
 
@@ -74,6 +113,12 @@ $(document).ready(function(){
 		$("#start_t").val(time_v[0]);
 		$("#end_t").val(time_v[1]);
 		if(time_v[0] != "") $("#time_tmp").text(time_v[0] + " ~ " + time_v[1]);
+	});
+
+	$("#t_reset").click(function(){
+		$("#start_t").val("");
+		$("#end_t").val("");
+		$("#time_tmp").text("");
 	});
 
 	$("#serious_page input").change(function(){
@@ -88,62 +133,181 @@ $(document).ready(function(){
 		else $(this).prop("checked", true);
 	});
 
+	$("#group_toggle").toggle(
+		function(){
+			$("#group_hr").slideDown();
+			$("#group_find").slideDown();
+			$(this).text("搜尋事故");
+			$("#find").text("事故統計");
+			use_group = true;
+		},
+		function(){
+			$("#group_hr").slideUp();
+			$("#group_find").slideUp();
+			$(this).text("事故統計");
+			$("#find").text("搜尋事故");
+			use_group = false;
+		}
+	);
+
+	$("#group_find button").click(function(){
+		if($(this).val() == ""){
+			$(this).css({"background-color":"darkslategray", "color":"whitesmoke", "border":"none"});
+			$(this).val($(this).text());
+			var new_val = $(this).val();
+			$(this).parent().children().each(function(){
+				if($(this).val() != new_val){
+					$(this).css({"background-color":"transparent", "color":"black", "border":"solid 1px gray"});
+					$(this).val("");
+				}
+			});
+		}
+		else{
+			$(this).css({"background-color":"transparent", "color":"black", "border":"solid 1px gray"});
+			$(this).val("");
+		}
+	});
+
 	$("#find_reset").click(function(){
 		$("#pos_page select").prop("selectedIndex", 0);
 		$("#pos_page input").val("");
 		$("#time_page input").val("");
 		$("#serious_page input").prop("checked", true);
 		$("#find_page .tmp").text("");
-		$("#serious_tmp").text("A1, A2, A3");
+		$("#serious_tmp").text("A1, A2");
+
+		$("#find_township").prop({"selectedIndex": 0, "disabled": true});
+		$("#find_street").prop({"selectedIndex": 0, "disabled": true});
+		$("#find_detail").prop("disabled", true);
+
+		$("#group_find button").each(function(){
+			if($(this).val() != ""){
+				$(this).css({"background-color":"transparent", "color":"black", "border":"solid 1px gray"});
+				$(this).val("");
+			}
+		});
 	});
 
 	$("#find_submit").click(function(){
 		var sql = "", record = "";
-		if($("#pos_tmp").text() == "" && $("#time_tmp").text() == "") sql = "條件過少，無法搜尋";
-		else{
-			if($("#pos_tmp").text() != ""){
-				sql += $("#pos_tmp").text();
-				record += $("#pos_tmp").text();
-			}
-			if($("#time_tmp").text() != ""){
-				if(sql != ""){
-					sql += "<br>";
-					record += "/";
-				}
-				sql += $("#time_tmp").text();
-				record += $("#time_tmp").text();
-			}
-			if($("#serious_tmp").text() != "A1, A2, A3"){
-				sql += "<br>" + $("#serious_tmp").text();
-				record += "/" + $("#serious_tmp").text();
-			}
-		}
-		$("#sql").html(sql);
-		if(record != ""){
-			$("#history_page p").hide();
-			$("#history_page").append("<button class='record'>" + record + "</button>");
-			$("#history_page .record").last().click(function(){
-				var record = $(this).text();
-				record = record.split("/");
-				$("#sql").html("");
-				for(var i = 0; i < record.length; i++){
-					if(i != 0) $("#sql").append("<br>");
-					$("#sql").append(record[i]);
-				}
-				$("#list").toggle("slide");
-				chstate(null);
-				$("#result_detail").hide();
+		if(use_group){
+			var pos_arr = [$("#find_county").val(), $("#find_township").val(), $("#find_street").val()];
+			var g_pos_arr = [$("#group_county").val(), $("#group_township").val(), $("#group_street").val()];
+			var pos_group_arr = ["county", "township", "street"];
+			pos_arr.forEach(element => {
+				if(element != "") pos_group_arr.splice(0, 1);
 			});
+			for(var i = 2; i >= 0; i--){
+				if(g_pos_arr[i] != "") break;
+				pos_group_arr.splice(-1, 1);
+			}
+
+			var start_t_arr = $("#start_t").val().split("-"), end_t_arr = $("#end_t").val().split("-");
+			var g_time_arr = [$("#group_year").val(), $("#group_month").val(), $("#group_date").val()];
+			var time_group_arr = ["year", "month", "date"];
+			var time_group = "";
+			for(var i = 0; i < 3; i++){
+				if(g_time_arr[i] != ""){
+					time_group = time_group_arr[i];
+					break;
+				}
+			}
+			if(start_t_arr.length == 3 && start_t_arr[0] == end_t_arr[0]){
+				if(time_group == "year") time_group = "";
+				else{
+					if(start_t_arr[1] == end_t_arr[1]){
+						if(time_group == "month") time_group = "";
+						else{
+							if(start_t_arr[2] == end_t_arr[2] && time_group == "date") time_group = "";
+						}
+					}
+				}
+			}
 		}
-		$("#list").toggle("slide");
-		chstate(null);
-		$("#result").show();
-		$("#result_detail").hide();
+		/*
+		else{
+			if($("#pos_tmp").text() == "" && $("#time_tmp").text() == "") sql = "條件過少，無法搜尋";
+			else{
+				if($("#pos_tmp").text() != ""){
+					sql += $("#pos_tmp").text();
+					record += $("#pos_tmp").text();
+				}
+				if($("#time_tmp").text() != ""){
+					if(sql != ""){
+						sql += "<br>";
+						record += "/";
+					}
+					sql += $("#time_tmp").text();
+					record += $("#time_tmp").text();
+				}
+				if($("#serious_tmp").text() != "A1, A2, A3"){
+					sql += "<br>" + $("#serious_tmp").text();
+					record += "/" + $("#serious_tmp").text();
+				}
+			}
+			$("#sql").html(sql);
+			if(record != ""){
+				$("#history_page p").hide();
+				$("#history_page").append("<button class='record'>" + record + "</button>");
+				$("#history_page .record").last().click(function(){
+					var record = $(this).text();
+					record = record.split("/");
+					$("#sql").html("");
+					for(var i = 0; i < record.length; i++){
+						if(i != 0) $("#sql").append("<br>");
+						$("#sql").append(record[i]);
+					}
+					$("#list").toggle("slide");
+					chstate(null);
+					$("#result_detail").hide();
+				});
+			}
+			$("#list").toggle("slide");
+			chstate(null);
+			$("#result").show();
+			$("#result_detail").hide();
+		}
+		*/
 	});
 
 	var Tstr_v = getTimeStr(new Date());
 	$("#upload_date").val(Tstr_v[0]);
 	$("#upload_time").val(Tstr_v[1]);
+
+	$("#upload_page select, #pos_page input").change(function(){
+		if($(this).attr("id") == "upload_county"){
+			if($(this).val() == ""){
+				$("#upload_township").prop({"selectedIndex": 0, "disabled": true});
+				$("#upload_street").prop({"selectedIndex": 0, "disabled": true});
+				$("#upload_detail").val("");
+				$("#upload_detail").prop("disabled", true);
+			}
+			else{
+				$("#upload_township").prop("disabled", false);
+				setTownship("upload", $(this).val());
+			}
+		}
+		else if($(this).attr("id") == "upload_township"){
+			if($(this).val() == ""){
+				$("#upload_street").prop({"selectedIndex": 0, "disabled": true});
+				$("#upload_detail").val("");
+				$("#upload_detail").prop("disabled", true);
+			}
+			else{
+				$("#upload_street").prop("disabled", false);
+				setStreet("upload", $("#upload_county").val(), $(this).val());
+			}
+		}
+		else if($(this).attr("id") == "upload_street"){
+			if($(this).val() == ""){
+				$("#upload_detail").val("");
+				$("#upload_detail").prop("disabled", true);
+			}
+			else{
+				$("#upload_detail").prop("disabled", false);
+			}
+		}
+	});
 
 	$("#upload_reset").click(function(){
 		$("#upload_page select").prop("selectedIndex", 0);
@@ -151,7 +315,11 @@ $(document).ready(function(){
 		Tstr_v = getTimeStr(new Date());
 		$("#upload_date").val(Tstr_v[0]);
 		$("#upload_time").val(Tstr_v[1]);
-		$("#upload_serious").prop("selectedIndex", 2);
+		$("#upload_serious").prop("selectedIndex", 0);
+
+		$("#upload_township").prop({"selectedIndex": 0, "disabled": true});
+		$("#upload_street").prop({"selectedIndex": 0, "disabled": true});
+		$("#upload_detail").prop("disabled", true);
 	});
 
 	$("#upload_submit").click(function(){
@@ -256,6 +424,7 @@ function getTimeStr(D){
 
 function setCounty(){
 	$("#find_county").html("<option value=''>請選擇縣市</option>");
+	$("#upload_county").html("<option value=''>請選擇縣市</option>");
 	for(var i = 0; i < county.length; i++){
 		$("#find_county").append("<option value='" + county[i] + "'>" + county[i] + "</option>");
 		$("#upload_county").append("<option value='" + county[i] + "'>" + county[i] + "</option>");
@@ -264,22 +433,49 @@ function setCounty(){
 	$("#upload_county").prop("selectedIndex", 0);
 }
 
-function setTownship(){
-	$("#find_township").html("<option value=''>請選擇鄉鎮市區</option>");
+function setTownship(mode, county){
+	var target = "#" + mode + "_township";
+	$(target).html("<option value=''>請選擇鄉鎮市區</option>");
 	for(var i = 0; i < township.length; i++){
-		$("#find_township").append("<option value='" + township[i] + "'>" + township[i] + "</option>");
-		$("#upload_township").append("<option value='" + township[i] + "'>" + township[i] + "</option>");
+		$(target).append("<option value='" + township[i] + "'>" + township[i] + "</option>");
 	}
-	$("#find_township").prop("selectedIndex", 0);
-	$("#upload_township").prop("selectedIndex", 0);
+	$(target).prop("selectedIndex", 0);
 }
 
-function setStreet(){
-	$("#find_street").html("<option value=''>請選擇街道名稱</option>");
+function setStreet(mode, county, township){
+	var target = "#" + mode + "_street";
+	$(target).html("<option value=''>請選擇街道名稱</option>");
 	for(var i = 0; i < street.length; i++){
-		$("#find_street").append("<option value='" + street[i] + "'>" + street[i] + "</option>");
-		$("#upload_street").append("<option value='" + street[i] + "'>" + street[i] + "</option>");
+		$(target).append("<option value='" + street[i] + "'>" + street[i] + "</option>");
 	}
-	$("#find_street").prop("selectedIndex", 0);
-	$("#upload_street").prop("selectedIndex", 0);
+	$(target).prop("selectedIndex", 0);
+}
+
+function checkGroup(id, value){
+	if(id == "group_county"){
+		if(value == ""){
+			$("#group_township").css({"background-color":"transparent", "color":"black", "border":"solid 1px gray"});
+			$("#group_township").val("");
+			$("#group_street").css({"background-color":"transparent", "color":"black", "border":"solid 1px gray"});
+			$("#group_street").val("");
+		}
+	}
+	else if(id == "group_township"){
+		if(value == ""){
+			$("#group_street").css({"background-color":"transparent", "color":"black", "border":"solid 1px gray"});
+			$("#group_street").val("");
+		}
+		else{
+			$("#group_county").css({"background-color":"darkslategray", "color":"whitesmoke", "border":"none"});
+			$("#group_county").val($("#group_county").text());
+		}
+	}
+	else if(id == "group_street"){
+		if(value != ""){
+			$("#group_county").css({"background-color":"darkslategray", "color":"whitesmoke", "border":"none"});
+			$("#group_county").val($("#group_county").text());
+			$("#group_township").css({"background-color":"darkslategray", "color":"whitesmoke", "border":"none"});
+			$("#group_township").val($("#group_township").text());
+		}
+	}
 }
