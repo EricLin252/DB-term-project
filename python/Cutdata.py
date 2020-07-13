@@ -1,96 +1,32 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jul 11 10:44:51 2020
+Created on Sat Jul 11 15:27:55 2020
 
-@author: 陳鈺升
+@author: JEFF
 """
 
-"""
-花蓮縣秀林鄉和仁村台9線164公里700公尺處南向外側車道
-
-我只要把他切成
-county：花蓮縣
-township：秀林鄉
-street：台九線
-detail：花蓮縣秀林鄉和仁村台9線164公里700公尺處南向外側車道
-"""
-
-
+import numpy as np
 import pandas as pd
-
-INFILE = "A1.csv"
-OUTFILE = "data"+INFILE
-
-initcols = ["發生時間","發生地點","經度","緯度"]
-newcols = ['county','township','street','except','multiroad']
-countrys = ["臺北市", "新北市", "基隆市", "桃園市", "新竹市", "新竹縣", "苗栗縣", "臺中市", "彰化縣", "雲林縣", "南投縣", "嘉義市", "嘉義縣", "臺南市", "高雄市", "屏東縣", "宜蘭縣", "花蓮縣", "台東縣", "澎湖縣"]
-times = ["年", "月", "日", "時", "分"]
-town = ["市", "縣", "鄉", "鎮", "區", "村", "里"]
-street = ["路", "街", "段", "巷", "弄", "道", "線"]
-""" cut the place into serveral cols"""
-
-df = pd.read_csv(INFILE)[initcols].dropna()
-
-# add empty cols
-for col in newcols:
-    df[col] = ""
-    
-#%%
-# breakdown the strings
 import re
+import datetime
 
-for i,placestr in enumerate(df["發生地點"]):
-    print("--------------------------------")
-    print(placestr)
-    
-    if re.match(r"(.*/.*)",placestr):
-        # Intersection
-        #df['multiroad'][i] = 1       
-        continue
-    
-    # county
-    cty = re.findall(r"(..[市縣])",placestr)
-    #df["county"][i] = cty[0]
-    placestr = re.sub(cty[0], "", placestr)
-    print(placestr)
-    
-    # township
-    twn = re.findall(r"(.{1,4}[市縣鄉鎮區])",placestr)
-    #df["township"][i] = twn[0]
-    placestr = re.sub(twn[0], "", placestr)
-    print(twn)
-    
-    # kill sub-town
-    subtwn = re.findall(r"(.{1,4}[村里])",placestr)
-    placestr = re.sub(subtwn[0], "", placestr)
-    print(subtwn)
-    
-    # street
-    st = re.findall(r"(.{1,5}[路街段巷弄道線])",placestr)
-    if len(st)>=2:
-        # Intersection
-        #df['multiroad'][i] = 1       
-        continue
-    
-    #df["street"][i] = st[0]
-    
-    print("--------------------------------")
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
+data = pd.read_csv('109_A1.csv')
+data = data.iloc[:-2,:]
+data.rename(columns={'發生地點':'detial'}, inplace=True)
+fucking_data = ['臺東縣臺東市東45 12公里附近']
+data = data[~data.detial.isin(fucking_data)]
+# create datetime column and change format
+replace_date = {'年':'-','月':'-',"日":'',"時":':',"分":':',"秒":''}
+data['datetime'] = data['發生時間'].replace(replace_date, regex=True)
+data['county'] = [re.search(r'^..[市縣]', str(x)).group() for x in data['detial']]
+data['township'] = [re.search(r"(?<=...).{1,3}[區市鎮鄉]", str(x)).group() for x in data['detial']]
+data['street'] = [re.findall("(?:(?:^..[市縣].{1,3}(?:(?<!區))+[鄉鎮市區])(?:.{1,3}(?:(?<!公))"
+                             "+[村里]|.*?)(國道.號|省道.*線|區道.*線|市道.*線|.{1,4}[路段線街道里巷])"
+                             ".*\s\/\s)(?:(?:..[市縣].{1,3}(?:(?<!區))+[鄉鎮市區])(?:.{1,3}(?:(?<!公))"
+                             "+[村里]|.*?)(國道.號|省道.*線|區道.*線|市道.*線|.{1,4}[路段線街道里巷]))"
+                             "|(?:(?:^..[市縣].{1,3}(?:(?<!區))+[鄉鎮市區])(?:.{1,3}(?:(?<!公))+[村里]|.??)"
+                             "(國道.號|省道.*線|區道.*線|市道.*線|.{1,4}[路段線街道里巷])|.*(台.線))",
+                             str(x)) for x in data['detial']]
+data['death'] = [int(re.search(r'^死亡(.*);受傷(.*)', str(x)).group(1)) for x in data['死亡受傷人數']]
+data['injured'] = [int(re.search(r'^死亡(.*);受傷(.*)', str(x)).group(2)) for x in data['死亡受傷人數']]
 #%%
-"""
-宜蘭縣宜蘭市191縣道路東側 / 宜蘭縣宜蘭市黎明路口
-['宜蘭縣', '宜蘭市', '91縣', '宜蘭縣', '宜蘭市']
-"""
