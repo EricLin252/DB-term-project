@@ -8,24 +8,42 @@ Created on Mon Jul 13 14:13:40 2020
 import numpy as np
 import pandas as pd
 
-INFILE = "A2.csv"
-OUTFILE = "data"+INFILE
+INFILE = "A1.csv"
+OUTFILE = "car_"+INFILE
+PREFIX = "all1"
 
 data = pd.read_csv(INFILE)[["發生時間","車種"]].dropna()
 #%%
 # new data frame with split value columns 
 data["車種"]= data["車種"].str.split(";")
-data["car_involved"] = data["車種"].str.len()
+#data["car_involved"] = data["車種"].str.len()
 
-# car types
-types = list(data["車種"].explode().unique())
+# ids
+data["data_id"] = PREFIX + data.index.astype('str')
 
-for t in types:
-    try: 
-        data[t] = [x.count(t) for x in data["車種"]]
-    except:
-        print(t)
-        pass
+# split to rows
+data = data.explode('車種')
+
+#data.to_csv(OUTFILE)
+
+
+
+
+
+
+
+
+
+## car types
+#types = list(data["車種"].explode().unique())
+#
+#for t in types:
+#    try: 
+#        data[t] = [x.count(t) for x in data["車種"]]
+#    except:
+#        print(t)
+#        pass
+#
 #%%
 
 """ get some things
