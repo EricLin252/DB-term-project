@@ -1,0 +1,29 @@
+總死亡人數
+SELECT SUM(death) as total_death
+FROM data_a1
+WHERE uid IN (SELECT data_id
+			  FROM pos_a1
+			  WHERE county = '' AND township = '' AND street = '' AND detail LIKE '');
+
+
+總受傷人數
+SELECT SUM(injured) as total_injured
+FROM data_a1
+WHERE uid IN (SELECT data_id
+			  FROM pos_a1
+			  WHERE county = '' AND township = '' AND street = '' AND detail LIKE '');
+
+總車禍次數
+SELECT COUNT(*) as total_incidents
+FROM data_a1
+WHERE uid IN (SELECT data_id
+			  FROM pos_a1
+			  WHERE county = '' AND township = '' AND street = '' AND detail LIKE '');
+
+各類車種的車禍次數
+SELECT category, COUNT(*) as total_incidents
+FROM vehicle_a1
+WHERE data_id IN (SELECT data_id
+			  FROM pos_a1
+			  WHERE county = '' AND township = '' AND street = '' AND detail LIKE '')
+GROUP BY category;
