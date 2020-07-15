@@ -8,7 +8,7 @@ Created on Mon Jul 13 14:13:40 2020
 import numpy as np
 import pandas as pd
 
-INFILE = "A1.csv"
+INFILE = "109_A1.csv"
 OUTFILE = "car_"+INFILE
 PREFIX = "all1"
 
@@ -17,7 +17,7 @@ data = pd.read_csv(INFILE)[["發生時間","車種"]].dropna()
 # new data frame with split value columns 
 data["車種"]= data["車種"].str.split(";")
 #data["car_involved"] = data["車種"].str.len()
-
+#%%
 # ids
 data["data_id"] = PREFIX + data.index.astype('str')
 
